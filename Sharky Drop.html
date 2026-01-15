@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Sharky Drop - Saint Valentin</title>
+<style>
+    body {
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background: #ffe6e6;
+        font-family: 'Arial', sans-serif;
+        color: #000;
+        text-align: center;
+        transition: background 0.3s, color 0.3s;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* header with left/right buttons and top-right theme toggle */
+    .top-bar {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        right: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        pointer-events: auto;
+    }
+    .top-left, .top-right {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+    .btn {
+        padding: 8px 12px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: bold;
+        border: none;
+        cursor: pointer;
+        background: #ff0066;
+        color: #fff;
+    }
+    .btn.whatsapp { background: #25D366; color: #fff; }
+    .btn.snap { background: #FFFC00; color: #000; }
+
+    #themeToggle {
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        font-weight: bold;
+        background: #333;
+        color: #fff;
+    }
+
+    body.dark {
+        background: #111;
+        color: #00ffcc;
+    }
+
+    /* animated text color between black and blue */
+    @keyframes colorShift {
+        0% { color: #000; }
+        100% { color: #0066cc; }
+    }
+    h1, p, .address {
+        animation: colorShift 2s linear infinite alternate;
+    }
+
+    h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+    }
+
+    p {
+        font-size: 1.2rem;
+        margin-bottom: 10px;
+    }
+
+    .address {
+        font-size: 1rem;
+        margin-top: 12px;
+    }
+
+    a.site-link {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #ff0066;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: bold;
+        transition: 0.3s;
+        margin-bottom: 12px;
+    }
+
+    a.site-link:hover { background-color: #cc0055; }
+
+    #countdown {
+        display: flex;
+        gap: 15px;
+        font-size: 2rem;
+        margin-top: 12px;
+    }
+
+    .time-box {
+        padding: 15px 20px;
+        border-radius: 10px;
+        color: #000;
+        font-weight: bold;
+        min-width: 70px;
+    }
+
+    /* fixed colors: days green, hours yellow, minutes yellow, seconds red */
+    .time-days { background-color: #2ecc71; color: #fff; }
+    .time-hours { background-color: #f1c40f; color: #000; }
+    .time-minutes { background-color: #f1c40f; color: #000; }
+    .time-seconds { background-color: #e74c3c; color: #fff; }
+
+    /* ensure small screens look good */
+    @media (max-width: 480px) {
+        #countdown { font-size: 1.2rem; gap: 8px; }
+        .time-box { padding: 10px 12px; min-width: 50px; }
+    }
+</style>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="top-left">
+            <!-- Snapchat button on the left -->
+            <a class="btn snap" href="https://snapchat.com/add/sharky_ss" target="_blank" rel="noopener">Snap: sharky_ss</a>
+        </div>
+
+        <div class="top-right">
+            <!-- WhatsApp button on the right and theme toggle (top-right) -->
+            <a class="btn whatsapp" href="https://wa.me/784654015" target="_blank" rel="noopener">WhatsApp: 784654015</a>
+            <button id="themeToggle">Mode sombre</button>
+        </div>
+    </div>
+
+    <h1>Sharky Drop - Édition Limitée Saint-Valentin</h1>
+    <p>Prépare-toi pour le drop exclusif !</p>
+
+    <!-- site link opens campusdistri.link as requested -->
+    <a class="site-link" href="https://campusdistri.link" target="_blank" rel="noopener">Découvre Sharky.link</a>
+
+    <!-- Address -->
+    <div class="address">Dakar, Sénégal — Liberté 6</div>
+
+    <div id="countdown" aria-live="polite">
+        <div class="time-box time-days"><span id="days">0</span>j</div>
+        <div class="time-box time-hours"><span id="hours">0</span>h</div>
+        <div class="time-box time-minutes"><span id="minutes">0</span>m</div>
+        <div class="time-box time-seconds"><span id="seconds">0</span>s</div>
+    </div>
+
+<script>
+    // Date du drop : 9 février 2026 00h00 (GMT)
+    const dropDate = new Date(Date.UTC(2026, 1, 9, 0, 0, 0)).getTime();
+
+    // Gestion thème clair/sombre (toggle en haut à droite)
+    const themeToggle = document.getElementById('themeToggle');
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+        document.body.classList.add('dark');
+        themeToggle.textContent = 'Mode clair';
+    }
+
+    themeToggle.addEventListener('click', () => {
+        document.body.classList.toggle('dark');
+        const isDark = document.body.classList.contains('dark');
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        themeToggle.textContent = isDark ? 'Mode clair' : 'Mode sombre';
+    });
+
+    // Mise à jour du compte à rebours (couleurs fixes via classes CSS)
+    function updateCountdown() {
+        const now = new Date().getTime();
+        const distance = dropDate - now;
+
+        if (distance < 0) {
+            document.getElementById("countdown").innerHTML = "🎉 Sharky Drop est live ! 🎉";
+            return;
+        }
+
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        document.getElementById("days").innerText = days;
+        document.getElementById("hours").innerText = hours;
+        document.getElementById("minutes").innerText = minutes;
+        document.getElementById("seconds").innerText = seconds;
+    }
+
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+</script>
+</body>
+</html>
